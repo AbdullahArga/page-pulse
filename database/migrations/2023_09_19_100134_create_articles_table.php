@@ -22,7 +22,6 @@ return new class extends Migration
             $table->boolean('is_active')->default(false);
             $table->foreignId('user_id')
                 ->constrained();
-            $table->timestamps();
 
             $table->timestamps();
         });

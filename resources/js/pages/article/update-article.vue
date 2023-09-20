@@ -1,5 +1,4 @@
 <script setup>
-import usersService from '@service/users'
 import useArticle from '@service/articles'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
