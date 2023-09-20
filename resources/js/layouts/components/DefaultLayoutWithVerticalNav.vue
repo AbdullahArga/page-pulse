@@ -127,6 +127,13 @@ const upgradeBanner = computed(() => {
       />
       <VerticalNavLink
         :item="{
+          title: $t('nav.articles'),
+          icon: 'mdi-post-outline',
+          to: '/articles',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
           title: 'Typography',
           icon: 'mdi-alpha-t-box-outline',
           to: '/typography',
@@ -160,24 +167,6 @@ const upgradeBanner = computed(() => {
           to: '/form-layouts',
         }"
       />
-    </template>
-
-    <template #after-vertical-nav-items>
-      <!-- 👉 illustration -->
-      <a
-        href="https://themeselection.com/item/materio-vuetify-laravel-admin-template"
-        target="_blank"
-        rel="noopener noreferrer"
-        style="margin-left: 7px"
-      >
-        <img
-          :src="upgradeBanner"
-          alt="upgrade-banner"
-          transition="scale-transition"
-          class="upgrade-banner mx-auto"
-          style="max-width: 230px"
-        />
-      </a>
     </template>
 
     <!-- 👉 Pages -->

@@ -1,7 +1,4 @@
 import { authStore } from '@/store/auth'
-import { AbilityBuilder, createMongoAbility } from '@casl/ability'
-import { ABILITY_TOKEN } from '@casl/vue'
-// import axios from 'axios';
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -11,7 +8,6 @@ const user = reactive({
 })
 export default function authService() {
   const auth = authStore()
-  const ability = inject(ABILITY_TOKEN)
 
   const processing = ref(false)
   const validationError = ref({})
@@ -28,18 +24,26 @@ export default function authService() {
     processing.value = true
     validationError.value = {}
     await axios
-      .post('api/login', loginForm)
+      .post('api/auth/login', loginForm)
       .then(async response => {
         //store user
-        window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token
+        // localStorage.setItem('accessToken', JSON.stringify(response.data.token))
+        // localStorage.setItem('userAbilities', JSON.stringify(userAbilities))
+        // ability.update(userAbilities)
+        console.log('access_token', response.data.access_token)
+        localStorage.setItem('access_token', JSON.stringify(response.data.access_token))
+        // localStorage.setItem('userData', JSON.stringify(userData))
+
         await auth.getUser()
         //get user
         //update ability
+        await auth.getAbilities()
         // sweet alert
         //router push
         router.push('/dashboard')
       })
       .catch(error => {
+        console.log(error)
         //print sweet alert
       })
       .finally(() => (processing.value = false))
@@ -58,10 +62,15 @@ export default function authService() {
     await axios
       .post('api/register', registerForm)
       .then(async response => {
+        localStorage.setItem('userAbilities', JSON.stringify(userAbilities))
+        ability.update(userAbilities)
+        localStorage.setItem('userData', JSON.stringify(userData))
+        localStorage.setItem('accessToken', JSON.stringify(accessToken))
         //store user
         await auth.getUser()
         //get user
         //update ability
+        await auth.getAbilities()
         // sweet alert
         //router push
         router.push('/dashboard')
@@ -87,24 +96,11 @@ export default function authService() {
         router.push({ name: 'auth.login' })
       })
       .catch(error => {
-        if (error.response?.data) {
-          validationError.value = error.response.data.errors
-        }
+        console.log('logout', error)
       })
       .finally(() => {
         processing.value = false
       })
-  }
-
-  const getAbilities = async () => {
-    await axios.get('/api/abilities').then(response => {
-      const permissions = response.data
-      const { can, rules } = new AbilityBuilder(createMongoAbility)
-
-      can(permissions)
-
-      ability.update(rules)
-    })
   }
   return {
     loginForm,
@@ -112,7 +108,6 @@ export default function authService() {
     registerForm,
     submitRegister,
     logout,
-    getAbilities,
     validationError,
   }
 }

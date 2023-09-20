@@ -1,4 +1,5 @@
 <script setup>
+import { authStore } from '@/store/auth'
 import AnalyticsAward from '@/views/dashboard/AnalyticsAward.vue'
 import AnalyticsBarCharts from '@/views/dashboard/AnalyticsBarCharts.vue'
 import AnalyticsDepositWithdraw from '@/views/dashboard/AnalyticsDepositWithdraw.vue'
@@ -10,6 +11,9 @@ import AnalyticsUserTable from '@/views/dashboard/AnalyticsUserTable.vue'
 import AnalyticsWeeklyOverview from '@/views/dashboard/AnalyticsWeeklyOverview.vue'
 import CardStatisticsVertical from '@core/components/cards/CardStatisticsVertical.vue'
 
+const auth = authStore()
+auth.getAbilities()
+console.log(auth.ability.can('add_article'))
 const totalProfit = {
   title: 'Total Profit',
   color: 'secondary',

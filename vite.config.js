@@ -2,11 +2,13 @@ import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import laravel from 'laravel-vite-plugin'
+import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { defineConfig } from 'vite'
 import vuetify from 'vite-plugin-vuetify'
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -23,7 +25,7 @@ export default defineConfig({
       },
     }),
     VueI18nPlugin({
-      include: resolve(dirname(fileURLToPath(import.meta.url)), './src/i18n/locales/**'), // provide a path to the folder where you'll store translation data (see below)
+      include: resolve(dirname(fileURLToPath(import.meta.url)), './resources/i18n/locales/**'), // provide a path to the folder where you'll store translation data (see below)
     }),
     vueJsx(),
 
@@ -57,7 +59,6 @@ export default defineConfig({
       '@images': fileURLToPath(new URL('./resources/images/', import.meta.url)),
       '@styles': fileURLToPath(new URL('./resources/styles/', import.meta.url)),
       '@configured-variables': fileURLToPath(new URL('./resources/styles/variables/_template.scss', import.meta.url)),
-      '@axios': fileURLToPath(new URL('./resources/js/plugins/axios', import.meta.url)),
       apexcharts: fileURLToPath(new URL('node_modules/apexcharts-clevision', import.meta.url)),
     },
   },

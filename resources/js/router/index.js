@@ -22,6 +22,25 @@ const router = createRouter({
           component: () => import('../pages/user/create-user.vue'),
         },
         {
+          path: 'update-user/:id',
+          component: () => import('../pages/user/update-user.vue'),
+          props: true,
+        },
+        {
+          path: 'articles',
+          name: 'articles.list',
+          component: () => import('../pages/article/articles.vue'),
+        },
+        {
+          path: 'create-article',
+          component: () => import('../pages/article/create-article.vue'),
+        },
+        {
+          path: 'update-article/:id',
+          component: () => import('../pages/article/update-article.vue'),
+          props: true,
+        },
+        {
           path: 'account-settings',
           component: () => import('../pages/account-settings.vue'),
         },

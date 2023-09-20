@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\StoreUserRequest;
+use App\Http\Requests\Auth\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::filter()->latest()->paginate($request->input('limit', 10));
+        $users = User::with('permissions', 'roles')->filter()->latest()->paginate($request->input('limit', 10));
         return UserResource::collection($users);
     }
 
@@ -35,29 +36,43 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $user)
     {
-        //
+        return $user;
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        //is_validated
+
+        //udpate
+        $user->name = $request->input('name');
+        if ($request->input('password'))
+            $user->password = $request->input('password');
+
+        //save
+        $user->save();
+
+        //response
+        return response()->json(['success' => true], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        //
+        if (auth()->id() != $user->id && auth()->user() && auth()->user()->hasPermission('delete_user')) {
+            $user->delete();
+        }
     }
     public function abilities()
     {
-        return 'abilities';
-        // return auth()->user()->roles();
+        if ($user = auth('api')->user())
+            return $user->allPermissions();
+        return [];
     }
 }
