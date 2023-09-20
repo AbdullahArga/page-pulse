@@ -24,13 +24,11 @@ class ArticlePolicy
     {
         return $user->hasPermission('update_article') && $user->id = $article->user_id;
     }
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function store(User $user)
+    public function is_active(User $user, Article $article)
     {
-        return $user->hasPermission('add_article');
+        return $article->is_active;
     }
+
     /**
      * Determine whether the user can view any models.
      */

@@ -16,6 +16,6 @@ class ArticleService
     {
         $data['user_id'] = auth()->id();
         $data['user_id'] = 1;
-        Article::create($data);
+        Article::findOrFail($data['id'])->update($data);
     }
 }

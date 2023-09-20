@@ -19,7 +19,16 @@ class Article extends Model
     {
         return $this->hasMany(Comment::class, 'article_id');
     }
-
+    public function scopeSelf($query)
+    {
+        return $query->when(auth('api')->user()->hasPermission('active_user'), function ($query) {
+            return $query->where('userId', auth('api')->id());
+        });
+    }
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', '=', true);
+    }
     public function scopeFilter($query)
     {
         return $query->when(request()->has('search'), function ($query) {

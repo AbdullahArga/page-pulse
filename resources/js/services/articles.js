@@ -1,7 +1,12 @@
+import { authStore } from '@/store/auth'
 import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 export default function useArticle() {
+  const auth = authStore()
+  const permissions = auth.getPermissions
+  const canActive = ref(permissions.includes('active_article'))
+
   const articles = ref([])
   const swal = inject('$swal')
 
@@ -16,8 +21,6 @@ export default function useArticle() {
   const loading = ref(false)
   const router = useRouter()
   const validationError = ref({})
-
-  const canActive = ref(true)
 
   const initialState = {
     title: '',
@@ -62,9 +65,9 @@ export default function useArticle() {
       .then(response => {
         //assign value
         articles.value = response.data.data
-        pagination.page = response.data.meta.current_page
-        pagination.last_page = response.data.meta.last_page
-        pagination.total = response.data.meta.total
+        pagination.page = response.data?.meta?.current_page
+        pagination.last_page = response.data?.meta?.last_page
+        pagination.total = response.data?.meta?.total
       })
       .catch(error => {
         console.log(error)
@@ -73,6 +76,30 @@ export default function useArticle() {
         loading.value = false
       })
   }
+  const getAllActiveArticles = () => {
+    if (loading.value) return
+
+    loading.value = true
+
+    //get param
+    const url = `api/articles/active?${paramsAsText.value}`
+    axios
+      .get(url)
+      .then(response => {
+        //assign value
+        articles.value = response.data.data
+        pagination.page = response.data?.meta?.current_page
+        pagination.last_page = response.data?.meta?.last_page
+        pagination.total = response.data?.meta?.total
+      })
+      .catch(error => {
+        console.log(error)
+      })
+      .finally(() => {
+        loading.value = false
+      })
+  }
+
   const destroy = articleId => {
     // if (loading.value) return
 
@@ -177,8 +204,6 @@ export default function useArticle() {
   }
 
   const activeSubmit = currentId => {
-    if (loading.value) return
-    loading.value = true
     axios
       .post('/api/articles/' + currentId + '/active')
       .then(response => {
@@ -189,13 +214,9 @@ export default function useArticle() {
         console.log(error)
         swal.fire('Error', "You Don't Have Right Permission", 'error')
       })
-      .finally(() => {
-        loading.value = false
-      })
+      .finally(() => {})
   }
   const inactiveSubmit = currentId => {
-    if (loading.value) return
-    loading.value = true
     axios
       .post('/api/articles/' + currentId + '/inactive')
       .then(response => {
@@ -205,11 +226,47 @@ export default function useArticle() {
       .catch(error => {
         swal.fire('Error', "You Don't Have Right Permission", 'error')
       })
+      .finally(() => {})
+  }
+  const article = ref({})
+  const showArticle = currentId => {
+    if (loading.value) return
+
+    loading.value = true
+
+    id.value = currentId
+    //get param
+    const url = `/api/articles/` + currentId + `/show`
+    axios
+      .get(url)
+      .then(response => {
+        article.value = response.data.data
+      })
+      .catch(error => {
+        swal.fire('Error', "You Don't Have Right Permission", 'error')
+      })
       .finally(() => {
         loading.value = false
       })
   }
-
+  let commentForm = reactive({ message: '' })
+  const createCommentSubmit = articleId => {
+    if (loading.value) return
+    loading.value = true
+    axios
+      .post(`/api/articles/${articleId}/comment`, commentForm)
+      .then(response => {
+        commentForm.message = ''
+        article.value.comments.unshift(response.data.data)
+      })
+      .catch(error => {
+        console.log(error)
+        // swal.fire('Error', "You Don't Have Right Permission", 'error')
+      })
+      .finally(() => {
+        loading.value = false
+      })
+  }
   return {
     getArticles,
     articles,
@@ -225,5 +282,10 @@ export default function useArticle() {
     activeSubmit,
     editArticle,
     updateArticleSubmit,
+    showArticle,
+    article,
+    createCommentSubmit,
+    commentForm,
+    getAllActiveArticles,
   }
 }

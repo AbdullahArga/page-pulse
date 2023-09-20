@@ -4,8 +4,7 @@ import useArticle from '@service/articles'
 
 import no_article_image from '@images/no-article.png'
 
-const { getArticles, articles, params, destroy, canActive, pagination, unactive, activeSubmit, inactiveSubmit } =
-  useArticle()
+const { getArticles, articles, params, destroy, canActive, pagination, activeSubmit, inactiveSubmit } = useArticle()
 
 getArticles()
 </script>
@@ -54,7 +53,7 @@ getArticles()
           <VCard>
             <VImg
               :src="article.image ? article.image : no_article_image"
-              height="250"
+              height="190"
             />
 
             <VCardText class="position-relative">
@@ -90,6 +89,7 @@ getArticles()
                     icon
                     class="mr-1 bg-warning"
                     size="small"
+                    v-if="article.is_author"
                     :to="'/update-article/' + article.id"
                   >
                     <VIcon icon="mdi-pencil-outline" />
@@ -97,6 +97,7 @@ getArticles()
                   <VBtn
                     icon
                     class="bg-error"
+                    v-if="article.is_author"
                     @click="destroy(article.id)"
                     size="small"
                   >

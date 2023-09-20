@@ -24,6 +24,7 @@ export default function usersService() {
     name: '',
     email: '',
     password: '',
+    role_id: '',
   }
 
   const form = reactive({ ...initialState })
@@ -119,7 +120,6 @@ export default function usersService() {
         router.push({ name: 'users.list' })
       })
       .catch(error => {
-        console.log(error)
         if (error.response?.data) {
           validationError.value = error.response.data.errors
         }
@@ -189,7 +189,21 @@ export default function usersService() {
         }
       })
   }
-
+  const roles = ref([])
+  const getRoles = () => {
+    loading.value = true
+    axios
+      .get('api/roles')
+      .then(response => {
+        roles.value = response.data.data
+      })
+      .catch(error => {
+        console.log('roles', error)
+      })
+      .finally(() => {
+        loading.value = false
+      })
+  }
   return {
     getUsers,
     users,
@@ -202,5 +216,7 @@ export default function usersService() {
     destroy,
     router,
     params,
+    roles,
+    getRoles,
   }
 }

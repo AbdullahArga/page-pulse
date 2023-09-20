@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Models\Role;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Contracts\Foundation\Application;
@@ -87,6 +88,16 @@ class AuthenticatedSessionController extends Controller
             'password' => Hash::make($request['password']),
             'name' => $request['name'],
         ]);
+
+        $user->roles()->sync([
+            'role_id' =>
+            Role::whereCode('user')->first()->id
+        ]);
+
+        if ($request->wantsJson()) {
+
+            return response()->json(['user' => $user]);
+        }
 
         return $this->successResponse($user, 'Registration Successfully');
     }

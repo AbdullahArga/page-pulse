@@ -22,7 +22,7 @@ class ArticleResource extends JsonResource
             'is_active' => $this->is_active,
             'tags' => $this->tags ?? '',
             'created_at' => $this->created_at->format('Y-m-d H:i'),
-
+            'is_author' => $this->user_id == auth('api')->id(),
             'user_id' => $this->user_id,
             'user' => $this->user->name,
 

@@ -26,7 +26,15 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        $articles = Article::with('user')->withCount('comments')->filter()->latest()->paginate(request()->input('limit', 6));
+        $articles = Article::self()->with('user')->withCount('comments')->filter()->latest()->paginate(request()->input('limit', 6));
+        return ArticleResource::collection($articles);
+    }
+    /**
+     * Display a listing of the resource.
+     */
+    public function allActiveArticle()
+    {
+        $articles = Article::active()->with('user')->withCount('comments')->filter()->latest()->paginate(request()->input('limit', 6));
         return ArticleResource::collection($articles);
     }
 
@@ -43,14 +51,18 @@ class ArticleController extends Controller
      */
     public function store(StoreArticleRequest $request)
     {
-        Gate::authorize('store', [ArticlePolicy::class]);
 
-        $data = $request->all();
+        $user = auth('api')->user();
+        if ($user && $user->hasPermission('add_article')) {
+            $data = $request->all();
 
-        \DB::transaction(function () use ($data, $request) {
-            $this->articleService->store($data);
-        });
-        return response()->json(['success' => true]);
+            \DB::transaction(function () use ($data, $request) {
+                $this->articleService->store($data);
+            });
+            return response()->json(['success' => true]);
+        } else {
+            abort(403);
+        }
     }
 
     /**
@@ -58,7 +70,24 @@ class ArticleController extends Controller
      */
     public function show(Article $article)
     {
+
         request()->merge(['with_content' => true]);
+        return new ArticleResource($article);
+    }
+    /**
+     * Display the specified resource.
+     */
+    public function view(Article $article)
+    {
+        Gate::authorize('is_active', $article);
+
+        request()->merge(['with_content' => true]);
+        $article
+            ->loadCount('comments')
+            ->load(['comments' => function ($query) {
+                $query->orderByDesc('created_at');
+                $query->with('user');
+            }]);
         return new ArticleResource($article);
     }
 

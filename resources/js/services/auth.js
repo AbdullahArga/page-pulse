@@ -24,16 +24,17 @@ export default function authService() {
     processing.value = true
     validationError.value = {}
     await axios
-      .post('api/auth/login', loginForm)
+      .post('api/login', loginForm)
       .then(async response => {
         //store user
-        // localStorage.setItem('accessToken', JSON.stringify(response.data.token))
-        // localStorage.setItem('userAbilities', JSON.stringify(userAbilities))
-        // ability.update(userAbilities)
-        console.log('access_token', response.data.access_token)
-        localStorage.setItem('access_token', JSON.stringify(response.data.access_token))
-        // localStorage.setItem('userData', JSON.stringify(userData))
-
+        localStorage.setItem('access_token', response.data.token)
+        const token = localStorage.getItem('access_token')
+        window.axios.defaults.headers.common = {
+          'X-Requested-With': 'XMLHttpRequest',
+          Accept: 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          Authorization: `Bearer ${token}`,
+        }
         await auth.getUser()
         //get user
         //update ability
@@ -62,18 +63,20 @@ export default function authService() {
     await axios
       .post('api/register', registerForm)
       .then(async response => {
-        localStorage.setItem('userAbilities', JSON.stringify(userAbilities))
-        ability.update(userAbilities)
-        localStorage.setItem('userData', JSON.stringify(userData))
-        localStorage.setItem('accessToken', JSON.stringify(accessToken))
-        //store user
-        await auth.getUser()
-        //get user
-        //update ability
-        await auth.getAbilities()
-        // sweet alert
-        //router push
-        router.push('/dashboard')
+        router.push({ name: 'auth.login' })
+
+        // localStorage.setItem('userAbilities', JSON.stringify(userAbilities))
+        // ability.update(userAbilities)
+        // localStorage.setItem('userData', JSON.stringify(userData))
+        // localStorage.setItem('accessToken', JSON.stringify(accessToken))
+        // //store user
+        // await auth.getUser()
+        // //get user
+        // //update ability
+        // await auth.getAbilities()
+        // // sweet alert
+        // //router push
+        // router.push('/dashboard')
       })
       .catch(error => {
         if (error.response?.data) {
@@ -102,6 +105,7 @@ export default function authService() {
         processing.value = false
       })
   }
+
   return {
     loginForm,
     submitLogin,

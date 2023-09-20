@@ -30,6 +30,12 @@ class UserController extends Controller
             'password' => Hash::make($request['password']),
             'name' => $request['name'],
         ]);
+
+        //add role for user
+        if ($request->input('role_id'))
+            $user->roles()->sync([
+                'role_id' => $request->input('role_id')
+            ]);
         return response()->json(['success' => true], 200);
     }
 
@@ -53,6 +59,11 @@ class UserController extends Controller
         if ($request->input('password'))
             $user->password = $request->input('password');
 
+        //add role for user
+        if ($request->input('role_id'))
+            $user->roles()->sync([
+                'role_id' => $request->input('role_id')
+            ]);
         //save
         $user->save();
 

@@ -1,7 +1,8 @@
 <script setup>
 import usersService from '@service/users'
 
-const { form, reset, validationError, createSubmit } = usersService()
+const { form, reset, validationError, createSubmit, getRoles, roles } = usersService()
+getRoles()
 </script>
 
 <template>
@@ -49,6 +50,23 @@ const { form, reset, validationError, createSubmit } = usersService()
                   type="password"
                   :placeholder="$t('enter_password')"
                 />
+                <!-- Validation Errors -->
+                <div class="text-error mt-1">
+                  <div v-for="message in validationError?.password">
+                    {{ message }}
+                  </div>
+                </div>
+              </VCol>
+              <VCol cols="12">
+                <VSelect
+                  :label="$t('Roles')"
+                  :items="roles"
+                  item-value="id"
+                  item-title="name"
+                  v-model="form.role_id"
+                >
+                </VSelect>
+
                 <!-- Validation Errors -->
                 <div class="text-error mt-1">
                   <div v-for="message in validationError?.password">
